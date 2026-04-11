@@ -1,0 +1,61 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSuperAdmin() {
+      return request.auth != null
+             && request.auth.token.role == "superadmin";
+    }
+
+    function isHost() {
+      return request.auth != null
+             && request.auth.token.role == "host";
+    }
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Event config — public read, super admin write
+    match /config/{doc} {
+      allow read: if true;
+      allow write: if isSuperAdmin();
+    }
+
+    // Hosts — any authenticated user can read, super admin manages
+    match /hosts/{hostId} {
+      allow read:  if isAuthenticated();
+      allow write: if isSuperAdmin();
+    }
+
+    // Invitados
+    match /invitados/{invitadoId} {
+      // Public read (needed for invite token lookup)
+      allow read: if true;
+
+      // Hosts and super admin can create
+      allow create: if isSuperAdmin() || isHost();
+
+      // Hosts can update any guest (all hosts see all, admins can edit all)
+      // Super admin can update/delete anyone
+      allow update: if isSuperAdmin()
+                    || isHost()
+                    // Public: invitados can confirm/mark as visited
+                    || (
+                      (resource.data.estado == "pendiente" || resource.data.estado == "visitado")
+                      && request.resource.data.diff(resource.data)
+                         .affectedKeys()
+                         .hasOnly(['estado','telefono','mensaje','songRequest','qrToken','fechaConfirmacion'])
+                    )
+                    // Public: QR validation mark (scanner offline)
+                    || (
+                      request.resource.data.diff(resource.data)
+                         .affectedKeys()
+                         .hasOnly(['qrValidado','fechaValidacion'])
+                    );
+
+      allow delete: if isSuperAdmin()
+                    || (isHost() && resource.data.estado in ['pendiente','visitado']);
+    }
+  }
+}

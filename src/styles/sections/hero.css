@@ -1,0 +1,259 @@
+/* ============================================================
+   HERO — Scroll-Pinned Envelope Parallax
+   The outer #hero is 250vh tall — this gives the scroll "space"
+   to drive the animation. The inner .hero__sticky stays pinned
+   at top:0 so the visual never moves; only the progress changes.
+   ============================================================ */
+
+#hero {
+  position: relative;
+  height: 250vh;          /* ← scroll space (150vh for animation) */
+  background-color: var(--navy-dark);
+}
+
+/* This sticky layer pins in viewport while outer #hero scrolls */
+.hero__sticky {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  height: 100dvh;
+  min-height: 600px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ---- Parallax stage ---- */
+.hero__stage {
+  position: relative;
+  width: min(480px, 92vw);
+  aspect-ratio: 5 / 7;
+  perspective: 1200px;
+  perspective-origin: center 40%;
+}
+
+/* ---- Envelope body ---- */
+.envelope__body {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-xl), 0 0 60px rgba(192,192,192,0.08);
+  background: var(--navy);
+  transform-style: preserve-3d;
+}
+
+.envelope__body img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Placeholder envelope when image not available */
+.envelope__placeholder {
+  width: 100%; height: 100%;
+  background: linear-gradient(160deg, var(--navy-light) 0%, var(--navy) 40%, var(--navy-dark) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: var(--space-4);
+  border-radius: var(--radius-lg);
+}
+
+.envelope__lines {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  overflow: hidden;
+}
+
+/* The V-fold effect (decorative lines) */
+.envelope__lines::before {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 55%;
+  background: linear-gradient(180deg, transparent 0%, rgba(13,33,55,0.6) 100%);
+}
+
+/* Silver border accent */
+.envelope__border {
+  position: absolute;
+  inset: 8px;
+  border: 1px solid rgba(192,192,192,0.25);
+  border-radius: calc(var(--radius-lg) - 4px);
+  pointer-events: none;
+}
+
+/* ---- Envelope flap (top) ---- */
+.envelope__flap {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 55%;
+  transform-origin: top center;
+  transform-style: preserve-3d;
+  z-index: 10;
+  /* transform set directly by JS: flap.style.transform = 'rotateX(Xdeg)' */
+  will-change: transform;
+}
+
+.envelope__flap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+/* Flap placeholder */
+.envelope__flap-placeholder {
+  width: 100%; height: 100%;
+  background: linear-gradient(180deg, var(--navy-mid) 0%, var(--navy) 100%);
+  clip-path: polygon(0 0, 100% 0, 50% 80%);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+/* Silver seal */
+.envelope__seal {
+  position: absolute;
+  top: calc(55% - 40px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px; height: 80px;
+  z-index: 20;
+  transition: transform 0.4s var(--ease-out);
+}
+
+.envelope__seal svg,
+.envelope__seal img {
+  width: 100%; height: 100%;
+  filter: drop-shadow(0 0 8px rgba(192,192,192,0.4));
+}
+
+/* ---- Save the Date card (inside envelope) ---- */
+.envelope__card {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--space-8);
+  background: linear-gradient(160deg, var(--cream) 0%, var(--cream-mid) 100%);
+  border-radius: var(--radius-lg);
+  opacity: 0;
+  transform: translateY(20px) scale(0.97);
+  transition: opacity 0.6s var(--ease-out), transform 0.6s var(--ease-out);
+  z-index: 5;
+}
+
+.envelope__card.revealed {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.envelope__card-photo {
+  width: 120px; height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--silver);
+  box-shadow: var(--shadow-silver);
+  margin-bottom: var(--space-4);
+}
+
+/* Circular photo placeholder */
+.envelope__card-photo-placeholder {
+  width: 120px; height: 120px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--navy-light), var(--navy));
+  border: 2px solid var(--silver);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: var(--space-4);
+}
+
+.envelope__card-greeting {
+  font-family: var(--font-elegant);
+  font-size: var(--text-sm);
+  color: var(--color-text-soft);
+  font-style: italic;
+  margin-bottom: var(--space-2);
+}
+
+.envelope__card-name {
+  font-family: var(--font-display);
+  font-size: clamp(var(--text-2xl), 6vw, var(--text-4xl));
+  color: var(--navy-dark);
+  line-height: 1.1;
+  margin-bottom: var(--space-2);
+}
+
+.envelope__card-divider {
+  width: 60px; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--silver), transparent);
+  margin: var(--space-3) auto;
+}
+
+.envelope__card-date {
+  font-family: var(--font-elegant);
+  font-size: var(--text-xl);
+  color: var(--navy);
+  letter-spacing: 0.08em;
+}
+
+.envelope__card-save {
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--silver-dark);
+  margin-top: var(--space-4);
+}
+
+/* ---- Scroll cue ---- */
+.hero__scroll-cue {
+  position: absolute;
+  bottom: var(--space-8);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--silver);
+  font-size: var(--text-xs);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  animation: float 2.5s ease-in-out infinite;
+  z-index: 100;
+}
+
+.hero__scroll-cue svg {
+  width: 20px; height: 20px;
+  color: var(--silver);
+}
+
+/* ---- Parallax bg stars ---- */
+.hero__bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 20% 20%, rgba(42,90,140,0.3) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 80%, rgba(42,90,140,0.2) 0%, transparent 60%),
+    var(--navy-dark);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.hero__stage {
+  z-index: 1;
+  position: relative;
+  will-change: transform;
+}
+
+/* ---- Responsive ---- */
+@media (max-height: 700px) {
+  .hero__stage { width: min(360px, 85vw); }
+}

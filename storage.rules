@@ -1,0 +1,13 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Reglas para la sección "Sube tus fotos" de los invitados
+    match /guest_photos/{imageId} {
+      // Cualquier persona puede subir y leer (para las galerías en vivo).
+      // Solo permitimos archivos de imagen (png, jpeg, webp) menores a 10MB
+      allow read: if true;
+      allow write: if request.resource.size < 10 * 1024 * 1024
+                   && request.resource.contentType.matches('image/.*');
+    }
+  }
+}
