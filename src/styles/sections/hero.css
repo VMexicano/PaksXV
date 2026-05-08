@@ -10,8 +10,8 @@
 
 .hero {
   position: relative;
-  height: 700vh;
-  /* extended runway: open + lift + long hold */
+  height: 400vh;
+  /* reduced runway for faster scroll on mobile */
   z-index: 1;
 }
 

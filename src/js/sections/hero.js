@@ -8,6 +8,9 @@
  *  - envelope.js sets --open and --lift CSS custom properties
  *  - CSS calc() drives flap rotation, seal split, card-inside slide, and floating card
  */
+import fondoLago from '../../assets/images/letter/fondo-lago.png';
+import xvLetras from '../../assets/images/letter/XV-letras.png';
+import fotoDiana from '../../assets/images/letter/foto-diana.png';
 
 export function renderHero(guest = null) {
   return `
@@ -29,9 +32,9 @@ export function renderHero(guest = null) {
             <!-- Card inside the envelope (clipped by .envelope overflow:hidden) -->
             <div class="card-inside" aria-hidden="true">
               <!-- Layers -->
-              <div class="card-layer" style="background-image: url('/src/assets/images/letter/fondo-lago.png'); z-index: 1;"></div>
-              <div class="card-layer" style="background-image: url('/src/assets/images/letter/XV-letras.png'); z-index: 2; background-position: center 20%;"></div>
-              <div class="card-layer" style="background-image: url('/src/assets/images/letter/foto-diana.png'); z-index: 3;"></div>
+              <div class="card-layer" style="background-image: url('${fondoLago}'); z-index: 1;"></div>
+              <div class="card-layer" style="background-image: url('${xvLetras}'); z-index: 2; background-position: center 20%;"></div>
+              <div class="card-layer" style="background-image: url('${fotoDiana}'); z-index: 3;"></div>
               
               <div class="card-overlay" style="z-index: 4;"></div>
               
@@ -80,9 +83,9 @@ export function renderHero(guest = null) {
       <!-- Final card OUTSIDE the envelope-stage — independent layer -->
       <div class="card" id="floating-card" role="img" aria-label="Tarjeta Save the Date para Diana Yaretzi">
         <!-- Layers -->
-        <div class="card-layer" style="background-image: url('/src/assets/images/letter/fondo-lago.png'); z-index: 1;"></div>
-        <div class="card-layer" style="background-image: url('/src/assets/images/letter/XV-letras.png'); z-index: 2; background-position: center 20%;"></div>
-        <div class="card-layer" style="background-image: url('/src/assets/images/letter/foto-diana.png'); z-index: 3;"></div>
+        <div class="card-layer" style="background-image: url('${fondoLago}'); z-index: 1;"></div>
+        <div class="card-layer" style="background-image: url('${xvLetras}'); z-index: 2; background-position: center 20%;"></div>
+        <div class="card-layer" style="background-image: url('${fotoDiana}'); z-index: 3;"></div>
         
         <div class="card-overlay" style="z-index: 4;"></div>
         

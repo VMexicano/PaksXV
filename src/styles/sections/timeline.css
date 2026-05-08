@@ -14,7 +14,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  background-image: url('/src/assets/images/itinerary/bg-itinerary.png');
+  background-image: url('../../assets/images/itinerary/bg-itinerary.png');
   background-size: cover;
   background-position: center;
   z-index: -1;
