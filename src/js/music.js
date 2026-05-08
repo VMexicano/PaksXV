@@ -1,48 +1,52 @@
 /**
  * Music module
- * - Shows overlay "Toca para entrar"
- * - On tap: plays MP3 background, hides overlay, shows FAB
+ * - Auto-plays on first user interaction (scroll/click)
  * - FAB toggles mute/unmute
  */
 
 const audio   = () => document.getElementById('bg-music');
-const overlay = () => document.getElementById('music-overlay');
 const fab     = () => document.getElementById('music-fab');
 const iconOn  = () => document.getElementById('icon-music-on');
 const iconOff = () => document.getElementById('icon-music-off');
 
+let hasStarted = false;
+
 export function initMusic() {
-  const overlayEl = overlay();
-  if (!overlayEl) return;
-
-  overlayEl.addEventListener('click', handleEntry, { once: true });
-}
-
-async function handleEntry() {
-  const audioEl   = audio();
-  const overlayEl = overlay();
-  const fabEl     = fab();
-
-  // Hide overlay
-  overlayEl.classList.add('hidden');
-  setTimeout(() => { overlayEl.style.display = 'none'; }, 600);
-
-  // Show FAB
+  const fabEl = fab();
   if (fabEl) {
-    fabEl.hidden = false;
-    fabEl.addEventListener('click', toggleMute);
+    fabEl.addEventListener('click', (e) => {
+      e.stopPropagation(); // Prevent triggering document clicks
+      toggleMute();
+    });
   }
 
-  // Try to play audio
-  if (audioEl?.src && !audioEl.src.includes('background.mp3') === false) {
+  // Try to start music on first user interaction anywhere
+  const startMusic = async () => {
+    if (hasStarted) return;
+    
+    const audioEl = audio();
+    if (!audioEl || audioEl.src.includes('background.mp3') === false) return;
+
     try {
       audioEl.volume = 0.4;
       await audioEl.play();
-      fabEl?.classList.add('playing');
+      hasStarted = true;
+      
+      if (fabEl) fabEl.classList.add('playing');
+      
+      // Cleanup listeners
+      ['click', 'touchstart', 'scroll'].forEach(evt => {
+        document.removeEventListener(evt, startMusic);
+      });
     } catch {
-      // Autoplay blocked — FAB still shown, user can unmute later
+      // Browsers may still block if interaction wasn't "trusted" enough
     }
-  }
+  };
+
+  // Listen for generic user interactions to unlock autoplay
+  ['click', 'touchstart', 'scroll'].forEach(evt => {
+    document.addEventListener(evt, startMusic, { once: true, passive: true });
+  });
 }
 
 function toggleMute() {
@@ -52,6 +56,7 @@ function toggleMute() {
 
   if (audioEl.paused) {
     audioEl.play().catch(() => {});
+    hasStarted = true;
     iconOn()?.removeAttribute('style');
     iconOff()?.setAttribute('style', 'display:none');
     fabEl?.classList.add('playing');

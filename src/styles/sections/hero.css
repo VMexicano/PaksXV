@@ -1,259 +1,604 @@
 /* ============================================================
-   HERO — Scroll-Pinned Envelope Parallax
-   The outer #hero is 250vh tall — this gives the scroll "space"
-   to drive the animation. The inner .hero__sticky stays pinned
-   at top:0 so the visual never moves; only the progress changes.
+   HERO — Scroll-Driven Envelope with 3-Phase Animation
+   
+   Architecture:
+   - .hero is 700vh tall → long scroll runway for open + lift + hold
+   - .hero-sticky pins at top:0 while outer section scrolls
+   - envelope.js sets --open (0→1) and --lift (0→1) on .hero-sticky
+   - All transforms are driven by CSS calc() reading those properties
    ============================================================ */
 
-#hero {
+.hero {
   position: relative;
-  height: 250vh;          /* ← scroll space (150vh for animation) */
-  background-color: var(--navy-dark);
+  height: 700vh;
+  /* extended runway: open + lift + long hold */
+  z-index: 1;
 }
 
-/* This sticky layer pins in viewport while outer #hero scrolls */
-.hero__sticky {
+.hero-sticky {
   position: sticky;
   top: 0;
-  width: 100%;
-  height: 100dvh;
-  min-height: 600px;
-  overflow: hidden;
+  height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-/* ---- Parallax stage ---- */
-.hero__stage {
-  position: relative;
-  width: min(480px, 92vw);
-  aspect-ratio: 5 / 7;
-  perspective: 1200px;
-  perspective-origin: center 40%;
-}
-
-/* ---- Envelope body ---- */
-.envelope__body {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  border-radius: var(--radius-lg);
   overflow: hidden;
-  box-shadow: var(--shadow-xl), 0 0 60px rgba(192,192,192,0.08);
-  background: var(--navy);
-  transform-style: preserve-3d;
+  perspective: 1600px;
 }
 
-.envelope__body img {
-  width: 100%; height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-/* Placeholder envelope when image not available */
-.envelope__placeholder {
-  width: 100%; height: 100%;
-  background: linear-gradient(160deg, var(--navy-light) 0%, var(--navy) 40%, var(--navy-dark) 100%);
+/* ---- Scroll hint ---- */
+.scroll-hint {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-elegant);
+  font-size: 14px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--gold-accent);
+  opacity: 0.85;
+  z-index: 20;
   display: flex;
-  align-items: center;
-  justify-content: center;
   flex-direction: column;
-  gap: var(--space-4);
-  border-radius: var(--radius-lg);
+  align-items: center;
+  gap: 8px;
+  transition: opacity 0.4s ease;
+  white-space: nowrap;
 }
 
-.envelope__lines {
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  overflow: hidden;
-}
-
-/* The V-fold effect (decorative lines) */
-.envelope__lines::before {
-  content: '';
-  position: absolute;
-  bottom: 0; left: 0; right: 0;
-  height: 55%;
-  background: linear-gradient(180deg, transparent 0%, rgba(13,33,55,0.6) 100%);
-}
-
-/* Silver border accent */
-.envelope__border {
-  position: absolute;
-  inset: 8px;
-  border: 1px solid rgba(192,192,192,0.25);
-  border-radius: calc(var(--radius-lg) - 4px);
+.scroll-hint.gone {
+  opacity: 0;
   pointer-events: none;
 }
 
-/* ---- Envelope flap (top) ---- */
-.envelope__flap {
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 55%;
-  transform-origin: top center;
+.scroll-hint .dot {
+  width: 1px;
+  height: 30px;
+  background: linear-gradient(to bottom, transparent, var(--gold-accent));
+  animation: scrollPulse 2s ease-in-out infinite;
+}
+
+@keyframes scrollPulse {
+
+  0%,
+  100% {
+    transform: scaleY(0.4);
+    opacity: 0.4;
+  }
+
+  50% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+/* ============================================================
+   ENVELOPE — Container & Stage
+   ============================================================ */
+
+.envelope-stage {
+  position: relative;
+  width: min(92vw, 460px);
+  aspect-ratio: 1.5 / 1;
   transform-style: preserve-3d;
-  z-index: 10;
-  /* transform set directly by JS: flap.style.transform = 'rotateX(Xdeg)' */
-  will-change: transform;
+  /* Tilt eases out as envelope opens.
+     During lift, envelope shifts UP to make room for the floating card. */
+  transform:
+    translateY(calc(var(--lift, 0) * -22vh)) rotateX(calc(8deg - var(--open, 0) * 8deg));
 }
 
-.envelope__flap img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-}
-
-/* Flap placeholder */
-.envelope__flap-placeholder {
-  width: 100%; height: 100%;
-  background: linear-gradient(180deg, var(--navy-mid) 0%, var(--navy) 100%);
-  clip-path: polygon(0 0, 100% 0, 50% 80%);
-  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-}
-
-/* Silver seal */
-.envelope__seal {
-  position: absolute;
-  top: calc(55% - 40px);
-  left: 50%;
-  transform: translateX(-50%);
-  width: 80px; height: 80px;
-  z-index: 20;
-  transition: transform 0.4s var(--ease-out);
-}
-
-.envelope__seal svg,
-.envelope__seal img {
-  width: 100%; height: 100%;
-  filter: drop-shadow(0 0 8px rgba(192,192,192,0.4));
-}
-
-/* ---- Save the Date card (inside envelope) ---- */
-.envelope__card {
+/* Envelope frame: back/front/flap/seal. overflow:hidden keeps geometry clean.
+   The floating .card lives OUTSIDE this — it can rise above. */
+.envelope {
   position: absolute;
   inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: var(--space-8);
-  background: linear-gradient(160deg, var(--cream) 0%, var(--cream-mid) 100%);
-  border-radius: var(--radius-lg);
-  opacity: 0;
-  transform: translateY(20px) scale(0.97);
-  transition: opacity 0.6s var(--ease-out), transform 0.6s var(--ease-out);
-  z-index: 5;
+  transform-style: preserve-3d;
+  overflow: hidden;
+  border-radius: 6px;
 }
 
-.envelope__card.revealed {
-  opacity: 1;
-  transform: translateY(0) scale(1);
-}
-
-.envelope__card-photo {
-  width: 120px; height: 120px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid var(--silver);
-  box-shadow: var(--shadow-silver);
-  margin-bottom: var(--space-4);
-}
-
-/* Circular photo placeholder */
-.envelope__card-photo-placeholder {
-  width: 120px; height: 120px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--navy-light), var(--navy));
-  border: 2px solid var(--silver);
-  display: flex; align-items: center; justify-content: center;
-  margin-bottom: var(--space-4);
-}
-
-.envelope__card-greeting {
-  font-family: var(--font-elegant);
-  font-size: var(--text-sm);
-  color: var(--color-text-soft);
-  font-style: italic;
-  margin-bottom: var(--space-2);
-}
-
-.envelope__card-name {
-  font-family: var(--font-display);
-  font-size: clamp(var(--text-2xl), 6vw, var(--text-4xl));
-  color: var(--navy-dark);
-  line-height: 1.1;
-  margin-bottom: var(--space-2);
-}
-
-.envelope__card-divider {
-  width: 60px; height: 1px;
-  background: linear-gradient(90deg, transparent, var(--silver), transparent);
-  margin: var(--space-3) auto;
-}
-
-.envelope__card-date {
-  font-family: var(--font-elegant);
-  font-size: var(--text-xl);
-  color: var(--navy);
-  letter-spacing: 0.08em;
-}
-
-.envelope__card-save {
-  font-family: var(--font-body);
-  font-size: var(--text-xs);
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--silver-dark);
-  margin-top: var(--space-4);
-}
-
-/* ---- Scroll cue ---- */
-.hero__scroll-cue {
+/* ---- Back wall ---- */
+.env-back {
   position: absolute;
-  bottom: var(--space-8);
-  left: 50%;
-  transform: translateX(-50%);
+  inset: 0;
+  border-radius: 6px;
+  background:
+    linear-gradient(135deg, #0d1d36 0%, #0a182c 50%, #0c1b32 100%);
+  box-shadow:
+    inset 0 0 60px rgba(0, 0, 0, 0.6),
+    inset 0 0 1px rgba(197, 160, 89, 0.4),
+    0 25px 80px rgba(0, 0, 0, 0.55);
+  overflow: hidden;
+}
+
+/* Subtle linen / paper texture */
+.env-back::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.015) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(-45deg, rgba(0, 0, 0, 0.04) 0 1px, transparent 1px 3px);
+  pointer-events: none;
+}
+
+/* Gold inner border */
+.env-back::after {
+  content: "";
+  position: absolute;
+  inset: 12px;
+  border: 1px solid rgba(197, 160, 89, 0.25);
+  border-radius: 3px;
+  pointer-events: none;
+}
+
+/* ---- Inside-card: slides up WITHIN the envelope (clipped) ---- */
+.card-inside {
+  position: absolute;
+  left: 6%;
+  right: 6%;
+  top: 4%;
+  height: 92%;
+  border-radius: 4px;
+  background-color: transparent;
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.3),
+    0 20px 60px rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: var(--space-2);
-  color: var(--silver);
-  font-size: var(--text-xs);
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  animation: float 2.5s ease-in-out infinite;
-  z-index: 100;
+  justify-content: flex-end;
+  padding: 0;
+  transform: translateY(calc((1 - var(--open, 0)) * 80% - var(--open, 0) * 4%));
+  z-index: 0;
+  overflow: hidden;
+  opacity: clamp(0, calc(1 - var(--lift, 0) * 3), 1);
 }
 
-.hero__scroll-cue svg {
-  width: 20px; height: 20px;
-  color: var(--silver);
+.card-inside::before,
+.card-inside::after {
+  display: none;
 }
 
-/* ---- Parallax bg stars ---- */
-.hero__bg {
+/* Content inside the card fades in as envelope opens */
+.card-content-inside {
+  opacity: clamp(0, calc((var(--open, 0) - 0.55) * 3.5), 1);
+  transform: translateY(calc((1 - clamp(0, calc((var(--open, 0) - 0.55) * 3.5), 1)) * 12px));
+  transition: opacity 0.1s linear;
+}
+
+/* ---- Top flap (opens upward) ---- */
+.env-flap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 60%;
+  transform-origin: top center;
+  transform: rotateX(calc(var(--open, 0) * -180deg));
+  transition: transform 0.05s linear;
+  z-index: 3;
+  pointer-events: none;
+  backface-visibility: visible;
+  -webkit-backface-visibility: visible;
+}
+
+.env-flap-inner {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse at 20% 20%, rgba(42,90,140,0.3) 0%, transparent 60%),
-    radial-gradient(ellipse at 80% 80%, rgba(42,90,140,0.2) 0%, transparent 60%),
-    var(--navy-dark);
-  z-index: 0;
+    linear-gradient(180deg, #142a4a 0%, #0e2240 60%, #0a1a32 100%);
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  box-shadow: inset 0 -2px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* Subtle paper texture on flap */
+.env-flap-inner::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.02) 0 1px, transparent 1px 4px);
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+}
+
+/* Gold V trim on flap */
+.env-flap-inner::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background:
+    linear-gradient(45deg, transparent calc(50% - 1px), rgba(197, 160, 89, 0.5) calc(50% - 0.5px), rgba(197, 160, 89, 0.5) calc(50% + 0.5px), transparent calc(50% + 1px)),
+    linear-gradient(-45deg, transparent calc(50% - 1px), rgba(197, 160, 89, 0.5) calc(50% - 0.5px), rgba(197, 160, 89, 0.5) calc(50% + 0.5px), transparent calc(50% + 1px));
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  opacity: 0.4;
+}
+
+/* ---- Front body — hides card when closed ---- */
+.env-front {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 45%;
+  background:
+    linear-gradient(180deg, #0d1d36 0%, #0a182c 60%, #08152a 100%);
+  border-radius: 0 0 6px 6px;
+  z-index: 2;
+  box-shadow:
+    inset 0 6px 20px rgba(0, 0, 0, 0.4),
+    inset 0 0 1px rgba(197, 160, 89, 0.5);
+}
+
+.env-front::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.015) 0 1px, transparent 1px 3px);
+  border-radius: inherit;
+}
+
+/* ============================================================
+   WAX SEAL — split in two halves (CSS only, no images)
+   ============================================================ */
+
+.seal {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: clamp(72px, 16vw, 100px);
+  height: clamp(72px, 16vw, 100px);
+  margin-left: calc(clamp(72px, 16vw, 100px) / -2);
+  margin-top: calc(clamp(72px, 16vw, 100px) / -2);
+  z-index: 10;
+  pointer-events: none;
+  transform-style: preserve-3d;
+}
+
+.seal-half {
+  position: absolute;
+  width: 100%;
+  height: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.seal-top {
+  top: 0;
+  transform-origin: bottom center;
+  transform: translateY(calc(var(--open, 0) * -40px)) rotate(calc(var(--open, 0) * -8deg));
+  opacity: clamp(0, calc(1 - var(--open, 0) * 1.4), 1);
+}
+
+.seal-bottom {
+  bottom: 0;
+  transform-origin: top center;
+  transform: translateY(calc(var(--open, 0) * 30px)) rotate(calc(var(--open, 0) * 6deg));
+  opacity: clamp(0, calc(1 - var(--open, 0) * 1.4), 1);
+}
+
+.seal-disc {
+  position: absolute;
+  width: 100%;
+  height: 200%;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 35% 30%, #d4b87a 0%, #c5a059 30%, #8a6d35 75%, #5d4820 100%);
+  box-shadow:
+    inset 2px 2px 6px rgba(255, 220, 160, 0.4),
+    inset -3px -3px 8px rgba(0, 0, 0, 0.5),
+    0 4px 12px rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.seal-top .seal-disc {
+  top: 0;
+}
+
+.seal-bottom .seal-disc {
+  bottom: 0;
+}
+
+.seal-content {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #2a1f0a;
+  text-align: center;
+  font-family: var(--font-display);
+}
+
+.seal-monogram {
+  font-size: clamp(26px, 6vw, 38px);
+  font-style: italic;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  text-shadow: 0 1px 0 rgba(255, 220, 160, 0.4);
+}
+
+.seal-label {
+  font-family: var(--font-body);
+  font-size: clamp(7px, 1.3vw, 9px);
+  letter-spacing: 0.25em;
+  font-weight: 600;
+  margin-top: 2px;
+  text-transform: uppercase;
+}
+
+/* ============================================================
+   FLOATING CARD — outside envelope, centers in viewport
+   ============================================================ */
+
+.card {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(94vw, 420px);
+  min-height: min(80vh, 560px);
+  border-radius: 6px;
+  background-color: transparent;
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.3),
+    0 30px 80px rgba(0, 0, 0, 0.55);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 0;
+  opacity: clamp(0, calc(var(--lift, 0) * 3), 1);
+  --y-up: calc(var(--lift, 0) * -50vh);
+  --y-down: calc(max(0, (var(--lift, 0) - 0.5)) * 100vh);
+  transform:
+    translate(-50%, -50%) translateY(calc(var(--y-up) + var(--y-down))) scale(calc(0.55 + var(--lift, 0) * 0.45));
+  z-index: 5;
+  overflow: hidden;
   pointer-events: none;
 }
 
-.hero__stage {
-  z-index: 1;
-  position: relative;
-  will-change: transform;
+.card::before,
+.card::after {
+  display: none;
 }
 
-/* ---- Responsive ---- */
-@media (max-height: 700px) {
-  .hero__stage { width: min(360px, 85vw); }
+/* ============================================================
+   CARD CONTENT — NEW FULLSCREEN LAYOUT
+   ============================================================ */
+
+.card-layer {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  border-radius: inherit;
+}
+
+.card-layer:nth-child(1) {
+  z-index: 1;
+}
+
+.card-layer:nth-child(2) {
+  z-index: 2;
+}
+
+.card-layer:nth-child(3) {
+  z-index: 3;
+  background-position: 75% center;
+  /* Shifted for mobile */
+}
+
+.card-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 40%, rgba(0, 0, 0, 0.6) 75%, rgba(0, 0, 0, 0.95) 100%);
+  z-index: 2;
+  border-radius: inherit;
+}
+
+.card-content-new {
+  position: relative;
+  z-index: 3;
+  width: 100%;
+  padding: 50px 20px 20px;
+  /* Reduced bottom padding to lower all text */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: white;
+}
+
+.card-save-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0;
+  /* Remove gap to push it down closer to Diana */
+}
+
+.card-save {
+  font-family: var(--font-elegant);
+  font-size: clamp(54px, 15vw, 100px);
+  color: white;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.6);
+  line-height: 1;
+  width: 100%;
+  text-align: center;
+}
+
+.card-mis {
+  font-family: var(--font-body);
+  font-size: clamp(16px, 4.5vw, 24px);
+  font-weight: 300;
+  letter-spacing: 0.05em;
+  align-self: flex-end;
+  margin-top: -15px;
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
+}
+
+.card-name-new {
+  font-family: var(--font-display);
+  font-size: clamp(54px, 16vw, 90px);
+  font-weight: 700;
+  color: white;
+  text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.8);
+  margin-top: 5px;
+  /* Reduced to bring texts closer */
+  line-height: 1;
+}
+
+.card-date-new {
+  font-family: var(--font-body);
+  font-size: clamp(14px, 4vw, 20px);
+  letter-spacing: 0.2em;
+  margin-top: 10px;
+  font-weight: 300;
+  opacity: 0.9;
+}
+
+/* ============================================================
+   HERO TITLE — floats above envelope, fades on open
+   ============================================================ */
+
+.hero-title {
+  position: absolute;
+  top: 8vh;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  z-index: 5;
+  opacity: clamp(0, calc(1 - var(--open, 0) * 1.6), 1);
+  transition: opacity 0.05s linear;
+}
+
+.hero-title .eyebrow {
+  font-family: var(--font-elegant);
+  font-style: italic;
+  color: var(--gold-accent);
+  font-size: clamp(12px, 2.4vw, 16px);
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.hero-title .name {
+  font-family: var(--font-display);
+  color: var(--cream-texture, #e8e2d6);
+  font-size: clamp(18px, 3.6vw, 26px);
+  letter-spacing: 0.05em;
+  margin-top: 4px;
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+/* Desktop / tablet horizontal */
+@media (min-width: 900px) {
+  .envelope-stage {
+    width: min(80vw, 620px);
+  }
+
+  .card {
+    width: min(60vw, 540px);
+    min-height: min(78vh, 660px);
+    padding: 56px 48px;
+    border-radius: 8px;
+  }
+
+  .card-layer:nth-child(3) {
+    background-position: center;
+    /* Reset to center on desktop */
+  }
+
+  .card-save {
+    font-size: 65px;
+  }
+
+  .card-mis {
+    font-size: 20px;
+  }
+
+  .card-name-new {
+    font-size: 100px;
+  }
+
+  .card-date-new {
+    font-size: 24px;
+  }
+
+  .card-content-new {
+    padding: 250px 60px 50px;
+  }
+
+  .card-inside {
+    padding: 0;
+  }
+
+  /* Bigger seal on desktop */
+  .seal {
+    width: 130px;
+    height: 130px;
+    margin-left: -65px;
+    margin-top: -65px;
+  }
+
+  .seal-monogram {
+    font-size: 50px;
+  }
+
+  .seal-label {
+    font-size: 11px;
+  }
+
+  .hero-title {
+    top: 6vh;
+  }
+
+  .hero-title .eyebrow {
+    font-size: 16px;
+    letter-spacing: 0.4em;
+  }
+
+  .hero-title .name {
+    font-size: 30px;
+  }
+}
+
+/* Larger desktop */
+@media (min-width: 1280px) {
+  .envelope-stage {
+    width: 680px;
+  }
+
+  .card {
+    width: 600px;
+    min-height: 680px;
+  }
+
+  .card-name-new {
+    font-size: 110px;
+  }
+
+  .card-save {
+    font-size: 90px;
+  }
+}
+
+/* Reduce motion */
+@media (prefers-reduced-motion: reduce) {
+  .scroll-hint .dot {
+    animation: none;
+  }
 }

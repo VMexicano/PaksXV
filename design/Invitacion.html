@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Diana Yaretzi · XV Años</title>
+<meta name="description" content="Save the Date — Mis XV Años · Diana Yaretzi · 04 de Julio de 2026" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css?v=12" />
+</head>
+<body style="font-family: system-ui; font-size: 16px">
+
+<!-- Cosmic background -->
+<div class="cosmos" aria-hidden="true"></div>
+
+<!-- ========== HERO: ENVELOPE ========== -->
+<section class="hero" data-screen-label="01 Sobre">
+  <div class="hero-sticky">
+
+    <!-- Floating title above envelope -->
+    <div class="hero-title">
+      <div class="eyebrow">Para&nbsp;ti</div>
+      <div class="name">Mis XV Años</div>
+    </div>
+
+    <!-- The envelope -->
+    <div class="envelope-stage" id="envelope-stage">
+      <div class="envelope">
+
+        <!-- Back wall -->
+        <div class="env-back" aria-hidden="true">
+          <!-- Card inside the envelope (clipped by .envelope overflow:hidden during inside-phase) -->
+          <div class="card-inside" aria-hidden="true">
+            <div class="card-content card-content-inside">
+              <div class="card-photo">DY</div>
+              <div class="card-eyebrow">Celebrando a</div>
+              <div class="card-name">Diana Yaretzi</div>
+              <div class="card-divider">
+                <span class="line"></span>
+                <span class="diamond"></span>
+                <span class="line"></span>
+              </div>
+              <div class="card-date">04 · JULIO · 2026</div>
+              <div class="card-cta">Save the Date</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Front (envelope body that hides bottom of card) -->
+        <div class="env-front" aria-hidden="true"></div>
+
+        <!-- Wax seal split into two halves -->
+        <div class="seal" aria-hidden="true">
+          <div class="seal-half seal-top">
+            <div class="seal-disc">
+              <div class="seal-content">
+                <div class="seal-monogram">DY</div>
+                <div class="seal-label">XV AÑOS</div>
+              </div>
+            </div>
+          </div>
+          <div class="seal-half seal-bottom">
+            <div class="seal-disc">
+              <div class="seal-content">
+                <div class="seal-monogram">DY</div>
+                <div class="seal-label">XV AÑOS</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Top flap (animates open) -->
+        <div class="env-flap" aria-hidden="true">
+          <div class="env-flap-inner"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Final card OUTSIDE the envelope-stage — independent layer that floats and settles -->
+    <div class="card" id="floating-card" role="img" aria-label="Tarjeta Save the Date para Diana Yaretzi">
+      <div class="card-content">
+        <div class="card-photo">DY</div>
+        <div class="card-eyebrow">Celebrando a</div>
+        <h1 class="card-name">Diana Yaretzi</h1>
+        <div class="card-divider">
+          <span class="line"></span>
+          <span class="diamond"></span>
+          <span class="line"></span>
+        </div>
+        <div class="card-date">04 · JULIO · 2026</div>
+        <div class="card-cta">Save the Date</div>
+      </div>
+    </div>
+
+    <!-- Scroll hint -->
+    <div class="scroll-hint" id="scroll-hint">
+      <span>Desliza para abrir</span>
+      <span class="dot"></span>
+    </div>
+
+  </div>
+</section>
+
+<!-- ========== COUNTDOWN ========== -->
+<section class="section" id="cuenta-regresiva" data-screen-label="02 Cuenta regresiva">
+  <div class="section-eyebrow">La espera</div>
+  <h2 class="section-title">Cuenta Regresiva</h2>
+  <div class="section-divider">
+    <span class="line"></span><span class="diamond"></span><span class="line"></span>
+  </div>
+
+  <div class="countdown glass">
+    <div class="countdown-cell">
+      <div class="countdown-num" id="cd-days">00</div>
+      <div class="countdown-label">Días</div>
+    </div>
+    <div class="countdown-cell">
+      <div class="countdown-num" id="cd-hours">00</div>
+      <div class="countdown-label">Horas</div>
+    </div>
+    <div class="countdown-cell">
+      <div class="countdown-num" id="cd-mins">00</div>
+      <div class="countdown-label">Min</div>
+    </div>
+    <div class="countdown-cell">
+      <div class="countdown-num" id="cd-secs">00</div>
+      <div class="countdown-label">Seg</div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <a href="#" class="btn" id="add-cal">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+      Agregar al calendario
+    </a>
+  </div>
+</section>
+
+<!-- ========== TIMELINE / ITINERARIO ========== -->
+<section class="section" id="itinerario" data-screen-label="03 Itinerario">
+  <div class="section-eyebrow">La velada</div>
+  <h2 class="section-title">Itinerario</h2>
+  <div class="section-divider">
+    <span class="line"></span><span class="diamond"></span><span class="line"></span>
+  </div>
+
+  <div class="timeline glass">
+    <div class="timeline-item">
+      <div class="timeline-time">7:00</div>
+      <div class="timeline-event">
+        <div class="timeline-event-title">Recepción</div>
+        <div class="timeline-event-desc">Bienvenida y cocktail</div>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-time">7:45</div>
+      <div class="timeline-event">
+        <div class="timeline-event-title">Misa de acción de gracias</div>
+        <div class="timeline-event-desc">Ceremonia religiosa</div>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-time">8:30</div>
+      <div class="timeline-event">
+        <div class="timeline-event-title">Cena</div>
+        <div class="timeline-event-desc">Tres tiempos</div>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-time">9:30</div>
+      <div class="timeline-event">
+        <div class="timeline-event-title">Vals y baile sorpresa</div>
+        <div class="timeline-event-desc">Momento estelar de Diana</div>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-time">10:30</div>
+      <div class="timeline-event">
+        <div class="timeline-event-title">Brindis y pastel</div>
+        <div class="timeline-event-desc">Acompáñanos a celebrar</div>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-time">11:00</div>
+      <div class="timeline-event">
+        <div class="timeline-event-title">Pista de baile</div>
+        <div class="timeline-event-desc">Hasta el amanecer ✦</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== DETAILS ========== -->
+<section class="section" id="detalles" data-screen-label="04 Detalles">
+  <div class="section-eyebrow">El lugar</div>
+  <h2 class="section-title">Detalles</h2>
+  <div class="section-divider">
+    <span class="line"></span><span class="diamond"></span><span class="line"></span>
+  </div>
+
+  <div class="info-grid">
+    <div class="info-card glass">
+      <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-7.5 8-13a8 8 0 1 0-16 0c0 5.5 8 13 8 13z"/><circle cx="12" cy="9" r="3"/></svg>
+      <div class="info-title">Jardín Nevado</div>
+      <div class="info-text">
+        <strong>Av. Nevado 172</strong><br/>
+        Portales Sur, Benito Juárez<br/>
+        03300 Ciudad de México, CDMX
+      </div>
+      <div class="map-frame">
+        <svg class="map-pin" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C7.6 0 4 3.6 4 8c0 5.4 8 16 8 16s8-10.6 8-16c0-4.4-3.6-8-8-8zm0 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/></svg>
+      </div>
+      <a href="https://maps.google.com/?q=Av+Nevado+172+Portales+Sur+CDMX" target="_blank" rel="noopener" class="info-link">
+        Cómo llegar →
+      </a>
+    </div>
+
+    <div class="info-card glass">
+      <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+      <div class="info-title">Hora</div>
+      <div class="info-text">
+        <strong>Sábado 4 de Julio · 7:00 PM</strong><br/>
+        Te pedimos llegar 15 minutos antes para no perderte la entrada de Diana.
+      </div>
+      <br/>
+      <div class="info-title" style="margin-top: 8px;">Estacionamiento</div>
+      <div class="info-text">
+        Servicio de <strong>valet parking</strong> sin costo en el acceso principal.
+      </div>
+    </div>
+
+    <div class="info-card glass">
+      <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 12l9 4 9-4M3 17l9 4 9-4"/></svg>
+      <div class="info-title">Código de vestimenta</div>
+      <div class="info-text">
+        <strong>Formal · Black Tie opcional</strong><br/>
+        Sugerencia: tonos azul marino, dorado, plata o crema para acompañar la paleta de la noche.
+      </div>
+    </div>
+
+    <div class="info-card glass">
+      <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8v8"/></svg>
+      <div class="info-title">Importante</div>
+      <div class="info-text">
+        Por respeto a Diana y su familia, te pedimos guardar tus celulares durante la ceremonia. Habrá fotógrafo profesional cubriendo cada momento.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== MESA DE REGALOS ========== -->
+<section class="section" id="mesa-regalos" data-screen-label="05 Mesa de regalos">
+  <div class="section-eyebrow">Tu presencia es nuestro mejor regalo</div>
+  <h2 class="section-title">Mesa de Regalos</h2>
+  <div class="section-divider">
+    <span class="line"></span><span class="diamond"></span><span class="line"></span>
+  </div>
+
+  <div class="gifts">
+    <div class="gift-card glass">
+      <div class="gift-logo">L</div>
+      <div class="gift-info">
+        <div class="gift-name">Liverpool</div>
+        <div class="gift-code">Evento No. 51624789</div>
+      </div>
+      <div class="gift-qr">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <rect width="100" height="100" fill="#e8e2d6"/>
+          <g fill="#0a192f">
+            <rect x="6" y="6" width="22" height="22"/><rect x="10" y="10" width="14" height="14" fill="#e8e2d6"/><rect x="14" y="14" width="6" height="6"/>
+            <rect x="72" y="6" width="22" height="22"/><rect x="76" y="10" width="14" height="14" fill="#e8e2d6"/><rect x="80" y="14" width="6" height="6"/>
+            <rect x="6" y="72" width="22" height="22"/><rect x="10" y="76" width="14" height="14" fill="#e8e2d6"/><rect x="14" y="80" width="6" height="6"/>
+            <rect x="34" y="6" width="4" height="4"/><rect x="42" y="6" width="4" height="4"/><rect x="50" y="6" width="4" height="4"/><rect x="58" y="6" width="4" height="4"/>
+            <rect x="6" y="34" width="4" height="4"/><rect x="14" y="38" width="4" height="4"/><rect x="22" y="34" width="4" height="4"/>
+            <rect x="34" y="34" width="4" height="4"/><rect x="42" y="42" width="4" height="4"/><rect x="50" y="34" width="4" height="4"/><rect x="58" y="42" width="4" height="4"/><rect x="66" y="34" width="4" height="4"/><rect x="74" y="38" width="4" height="4"/><rect x="82" y="34" width="4" height="4"/><rect x="90" y="42" width="4" height="4"/>
+            <rect x="38" y="50" width="4" height="4"/><rect x="46" y="58" width="4" height="4"/><rect x="54" y="50" width="4" height="4"/><rect x="62" y="58" width="4" height="4"/><rect x="70" y="50" width="4" height="4"/>
+            <rect x="34" y="66" width="4" height="4"/><rect x="42" y="74" width="4" height="4"/><rect x="50" y="66" width="4" height="4"/><rect x="58" y="74" width="4" height="4"/><rect x="66" y="66" width="4" height="4"/>
+            <rect x="34" y="82" width="4" height="4"/><rect x="42" y="82" width="4" height="4"/><rect x="50" y="90" width="4" height="4"/><rect x="58" y="82" width="4" height="4"/>
+            <rect x="74" y="50" width="4" height="4"/><rect x="82" y="58" width="4" height="4"/><rect x="90" y="50" width="4" height="4"/>
+            <rect x="74" y="74" width="4" height="4"/><rect x="82" y="82" width="4" height="4"/><rect x="90" y="74" width="4" height="4"/><rect x="74" y="90" width="4" height="4"/>
+          </g>
+        </svg>
+      </div>
+    </div>
+
+    <div class="gift-card glass">
+      <div class="gift-logo">$</div>
+      <div class="gift-info">
+        <div class="gift-name">Lluvia de sobres</div>
+        <div class="gift-code">El día del evento</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <a href="https://www.liverpool.com.mx/tienda/mesa-de-regalos" target="_blank" rel="noopener" class="btn">Ver mesa completa →</a>
+  </div>
+</section>
+
+<!-- ========== UPLOAD PHOTOS ========== -->
+<section class="section" id="subir-fotos" data-screen-label="06 Subir fotos">
+  <div class="section-eyebrow">Comparte la magia</div>
+  <h2 class="section-title">Tus Fotos del Evento</h2>
+  <div class="section-divider">
+    <span class="line"></span><span class="diamond"></span><span class="line"></span>
+  </div>
+
+  <p style="text-align:center; font-family: var(--font-script); font-style: italic; font-size: 17px; color: var(--silver); max-width: 480px; margin: 0 auto 28px; opacity: 0.9;">
+    Ayúdanos a recordar cada momento. Sube las fotos que hayas tomado durante la noche y forma parte del álbum digital de Diana.
+  </p>
+
+  <label class="upload-zone glass" id="upload-zone" for="upload-input">
+    <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+      <polyline points="17 8 12 3 7 8"/>
+      <line x1="12" y1="3" x2="12" y2="15"/>
+    </svg>
+    <div class="upload-text">Toca para subir tus fotos</div>
+    <div class="upload-hint">JPG, PNG o HEIC · hasta 25MB cada una</div>
+    <input id="upload-input" type="file" accept="image/*" multiple hidden />
+  </label>
+  <p id="upload-count" style="text-align:center; margin-top:18px; font-family: var(--font-script); font-style: italic; color: var(--gold); opacity: 0; transition: opacity .3s;"></p>
+</section>
+
+<!-- ========== RSVP ========== -->
+<section class="section" id="rsvp" data-screen-label="07 RSVP">
+  <div class="section-eyebrow">Confirma tu asistencia</div>
+  <h2 class="section-title">RSVP</h2>
+  <div class="section-divider">
+    <span class="line"></span><span class="diamond"></span><span class="line"></span>
+  </div>
+
+  <form class="rsvp-form glass" id="rsvp-form">
+    <div>
+      <label class="field-label" for="rsvp-name">Tu nombre completo</label>
+      <input class="field-input" id="rsvp-name" type="text" placeholder="Como aparece en tu invitación" required />
+    </div>
+
+    <div>
+      <label class="field-label">¿Nos acompañarás?</label>
+      <div class="choice-row">
+        <div class="choice active">Con gusto, ahí estaré</div>
+        <div class="choice">No podré asistir</div>
+      </div>
+    </div>
+
+    <div>
+      <label class="field-label" for="rsvp-pax">Número de personas</label>
+      <input class="field-input" id="rsvp-pax" type="number" min="1" max="4" value="1" />
+    </div>
+
+    <div>
+      <label class="field-label" for="rsvp-diet">Restricciones alimenticias (opcional)</label>
+      <input class="field-input" id="rsvp-diet" type="text" placeholder="Vegetariano, alergias, etc." />
+    </div>
+
+    <div>
+      <label class="field-label" for="rsvp-msg">Un mensaje para Diana (opcional)</label>
+      <input class="field-input" id="rsvp-msg" type="text" placeholder="Dedicale unas palabras..." />
+    </div>
+
+    <button type="submit" class="btn btn-primary" style="margin-top: 8px;">Confirmar asistencia</button>
+  </form>
+</section>
+
+<!-- ========== FOOTER ========== -->
+<footer class="footer">
+  <p class="footer-quote">
+    “Hoy dejo atrás mi niñez para comenzar a escribir mi propia historia.”
+  </p>
+  <div class="footer-mark">DY</div>
+  <div class="footer-meta">Diana Yaretzi · 04 · 07 · 2026</div>
+</footer>
+
+<script src="app.js?v=6"></script>
+</body>
+</html>

@@ -3,7 +3,7 @@
    ============================================================ */
 
 #gallery {
-  background: var(--navy-dark);
+  background: transparent;
   padding-block: var(--section-py);
   overflow: hidden;
 }

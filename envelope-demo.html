@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sobre Animado – Demo</title>
+  <style>
+    /* ── Variables ── */
+    :root {
+      --env-color:   #0077B2;
+      --env-color2:  #006aa0;
+      --env-flap:    #00547e;
+      --env-bg:      #d6edf8;
+      --heart-color: #D00000;
+      --env-w: 280px;
+      --env-h: 180px;
+      --env-radius: 6px;
+      --heart-w: 50px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2.5rem;
+      background-color: var(--env-bg);
+      font-family: system-ui, sans-serif;
+    }
+
+    /* ── Envelope wrapper ── */
+    #envelope {
+      position: relative;
+      width:  var(--env-w);
+      height: var(--env-h);
+      border-bottom-left-radius:  var(--env-radius);
+      border-bottom-right-radius: var(--env-radius);
+      background-color: var(--env-flap);
+      box-shadow: 0 4px 20px rgba(0,0,0,.25);
+      cursor: pointer;
+    }
+
+    /* ── Shared triangle base ── */
+    .front {
+      position: absolute;
+      width: 0;
+      height: 0;
+      z-index: 3;
+    }
+
+    /* ── Top flap (triangle pointing down) ── */
+    .flap {
+      border-left:  calc(var(--env-w) / 2) solid transparent;
+      border-right: calc(var(--env-w) / 2) solid transparent;
+      border-top:   calc(var(--env-h) / 2 + 8px) solid var(--env-color);
+      transform-origin: top center;
+      pointer-events: none;
+      transition: transform .4s ease, z-index .6s;
+      z-index: 3;
+    }
+
+    /* ── Bottom pocket ── */
+    .pocket {
+      border-left:   calc(var(--env-w) / 2) solid var(--env-color2);
+      border-right:  calc(var(--env-w) / 2) solid var(--env-color2);
+      border-bottom: calc(var(--env-h) / 2) solid var(--env-color);
+      bottom: 0;
+      border-radius: var(--env-radius);
+    }
+
+    /* ── Letter ── */
+    .letter {
+      position: absolute;
+      background-color: #fff;
+      width: 90%;
+      left: 5%;
+      height: 90%;
+      top: 5%;
+      border-radius: 6px;
+      z-index: 2;
+      transition: transform .4s .2s ease;
+    }
+
+    .words {
+      position: absolute;
+      background-color: #eeeff0;
+      height: 10px;
+      left: 10%;
+    }
+    .line1 { width: 40%; top: 20%; }
+    .line2 { width: 80%; top: 40%; }
+    .line3 { width: 80%; top: 60%; }
+    .line4 { width: 80%; top: 80%; }
+
+    /* ── Hearts container ── */
+    .hearts {
+      position: absolute;
+      top: calc(var(--env-h) / 2);
+      left: 0; right: 0;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    /* ── Heart shape ── */
+    .heart {
+      position: absolute;
+      bottom: 0;
+      width: var(--heart-w);
+      height: calc(var(--heart-w) * 1.6);
+      opacity: 0;
+    }
+
+    .heart::before,
+    .heart::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      width: var(--heart-w);
+      height: calc(var(--heart-w) * 1.6);
+      background: var(--heart-color);
+      border-radius: calc(var(--heart-w)) calc(var(--heart-w)) 0 0;
+    }
+    .heart::before {
+      left: var(--heart-w);
+      transform: rotate(-45deg);
+      transform-origin: 0 100%;
+    }
+    .heart::after {
+      left: 0;
+      transform: rotate(45deg);
+      transform-origin: 100% 100%;
+    }
+
+    .a1 { left: 20%; transform: scale(0.6); }
+    .a2 { left: 45%; transform: scale(1);   }
+    .a3 { left: 70%; transform: scale(0.8); }
+
+    /* ── Open state ── */
+    #envelope.open .flap {
+      transform: rotateX(180deg);
+      z-index: 1;
+    }
+
+    #envelope.open .letter {
+      transform: translateY(calc(var(--env-h) / -1.5));
+      z-index: 4;
+      transition: transform .4s .6s ease;
+    }
+
+    #envelope.open .a1 {
+      animation:
+        circMove 2s .5s  linear     infinite,
+        sideMove 4s .5s  ease-in-out infinite,
+        fadeHrt  2s .5s  linear     infinite;
+    }
+    #envelope.open .a2 {
+      animation:
+        circMove 4s 1s   linear     infinite,
+        sideMove 2s 1s   ease-in-out infinite,
+        fadeHrt  4s 1s   linear     infinite;
+    }
+    #envelope.open .a3 {
+      animation:
+        circMove 3s .5s  linear     infinite,
+        sideMove 3s .5s  ease-in-out infinite,
+        fadeHrt  3s .5s  linear     infinite;
+    }
+
+    @keyframes circMove {
+      from { bottom: 0; }
+      to   { bottom: 300px; }
+    }
+    @keyframes sideMove {
+      0%, 100% { margin-left: 0; }
+      50%      { margin-left: 20px; }
+    }
+    @keyframes fadeHrt {
+      0%       { opacity: 0; }
+      30%, 80% { opacity: 1; }
+      100%     { opacity: 0; }
+    }
+
+    /* ── Buttons ── */
+    .controls {
+      display: flex;
+      gap: .75rem;
+    }
+
+    .controls button {
+      padding: 8px 20px;
+      font-weight: 700;
+      font-size: .85rem;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: var(--env-color);
+      border: 2px solid var(--env-color);
+      background: transparent;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background .2s, color .2s;
+    }
+
+    .controls button:hover {
+      background: var(--env-color);
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="envelope" class="close">
+    <!-- Flap (top triangle) -->
+    <div class="front flap"></div>
+    <!-- Pocket (bottom triangle) -->
+    <div class="front pocket"></div>
+    <!-- Letter -->
+    <div class="letter">
+      <div class="words line1"></div>
+      <div class="words line2"></div>
+      <div class="words line3"></div>
+      <div class="words line4"></div>
+    </div>
+    <!-- Floating hearts -->
+    <div class="hearts">
+      <div class="heart a1"></div>
+      <div class="heart a2"></div>
+      <div class="heart a3"></div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button id="btn-open">Open</button>
+    <button id="btn-reset">Reset</button>
+  </div>
+
+  <script>
+    const envelope = document.getElementById('envelope');
+    const btnOpen  = document.getElementById('btn-open');
+    const btnReset = document.getElementById('btn-reset');
+
+    function openEnvelope() {
+      envelope.classList.add('open');
+      envelope.classList.remove('close');
+    }
+
+    function resetEnvelope() {
+      envelope.classList.add('close');
+      envelope.classList.remove('open');
+    }
+
+    envelope.addEventListener('click', openEnvelope);
+    btnOpen.addEventListener('click',  openEnvelope);
+    btnReset.addEventListener('click', resetEnvelope);
+  </script>
+
+</body>
+</html>

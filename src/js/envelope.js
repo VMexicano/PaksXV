@@ -1,74 +1,56 @@
 /**
- * Envelope parallax — scroll-pinned pattern
+ * Envelope scroll-driven animation
  *
- * How it works:
- * - #hero is 250vh tall → gives 150vh of "scroll room" after the first viewport
- * - .hero__sticky inside uses position:sticky so visuals stay fixed
- * - JS reads how far we've scrolled THROUGH the hero section to get progress 0→1
- * - progress drives: flap rotation, seal opacity/scale, card reveal, scroll-cue fade
+ * Drives two CSS custom properties on the hero-sticky and envelope-stage:
+ *   --open (0 → 1): flap opens, seal splits, inside-card peeks out
+ *   --lift (0 → 1): card exits envelope, floats up, then settles at viewport center
+ *
+ * Phase map over the 700vh scroll runway:
+ *   0.00 – 0.08  intro pause (envelope visible, nothing moves)
+ *   0.08 – 0.32  envelope opens (--open: 0 → 1)
+ *   0.32 – 0.40  hold (envelope open, inside card peek)
+ *   0.40 – 0.62  card lifts out and settles (--lift: 0 → 1)
+ *   0.62 – 1.00  long hold: final card stays visible while scrolling continues
  */
 
 export function initEnvelope() {
-  const hero  = document.getElementById('hero');
-  const flap  = document.getElementById('envelope-flap');
-  const seal  = document.getElementById('envelope-seal');
-  const card  = document.getElementById('envelope-card');
-  const cue   = document.getElementById('scroll-cue');
-  const stage = document.getElementById('envelope-stage');
+  const hero       = document.querySelector('.hero');
+  const stage      = document.getElementById('envelope-stage');
+  const stickyHost = document.querySelector('.hero-sticky');
+  const scrollHint = document.getElementById('scroll-hint');
 
-  if (!hero || !flap) return;
+  if (!hero || !stage) return;
 
-  let ticking = false;
-
-  function update() {
-    // How far have we scrolled into the hero section?
-    // scrolledPast: pixels scrolled past the top of #hero
-    const heroTop    = hero.getBoundingClientRect().top + window.scrollY;
-    const scrolled   = Math.max(0, window.scrollY - heroTop);
-    // animRange: the 150vh of "extra" scroll space we added
-    const animRange  = hero.offsetHeight - window.innerHeight;
-    // progress: 0 (start) → 1 (envelope fully open)
-    const progress   = Math.min(1, Math.max(0, scrolled / animRange));
-
-    // ── Flap: 0° (closed) → -170° (open/folded back) ──────────
-    const flapRot = progress * -170;
-    flap.style.transform = `rotateX(${flapRot}deg)`;
-
-    // ── Seal: scales down and fades as flap lifts ──────────────
-    if (seal) {
-      const sealProgress = Math.min(1, progress * 2); // faster than flap
-      seal.style.transform   = `translateX(-50%) scale(${1 - sealProgress * 0.5})`;
-      seal.style.opacity     = String(Math.max(0, 1 - sealProgress));
-    }
-
-    // ── Card reveal: appears at 55% progress ───────────────────
-    if (card) {
-      card.classList.toggle('revealed', progress > 0.55);
-    }
-
-    // ── Scroll cue: fast fade ──────────────────────────────────
-    if (cue) {
-      cue.style.opacity = String(Math.max(0, 1 - progress * 6));
-    }
-
-    // ── Envelope stage: subtle scale-up as it "opens" ──────────
-    if (stage) {
-      const sc = 1 + progress * 0.04; // 1.0 → 1.04
-      stage.style.transform = `scale(${sc})`;
-    }
-
-    ticking = false;
+  function clamp(x, a, b) {
+    return Math.min(Math.max(x, a), b);
   }
 
-  window.addEventListener('scroll', () => {
-    if (!ticking) {
-      requestAnimationFrame(update);
-      ticking = true;
+  function onScroll() {
+    const rect    = hero.getBoundingClientRect();
+    const vh      = window.innerHeight;
+    const total   = hero.offsetHeight - vh;
+    const scrolled = Math.min(Math.max(-rect.top, 0), total);
+    const raw     = total > 0 ? scrolled / total : 0;
+
+    // Compute phase progress
+    const openProg = clamp((raw - 0.08) / 0.24, 0, 1);
+    const liftProg = clamp((raw - 0.40) / 0.22, 0, 1);
+
+    // Set on both hosts so descendants and siblings can read them
+    if (stickyHost) {
+      stickyHost.style.setProperty('--open', openProg.toFixed(4));
+      stickyHost.style.setProperty('--lift', liftProg.toFixed(4));
     }
-  }, { passive: true });
+    stage.style.setProperty('--open', openProg.toFixed(4));
+    stage.style.setProperty('--lift', liftProg.toFixed(4));
 
-  // Also update on resize (viewport height change)
-  window.addEventListener('resize', update, { passive: true });
+    // Scroll hint fades out early
+    if (scrollHint) {
+      scrollHint.classList.toggle('gone', raw > 0.04);
+    }
+  }
 
-  update(); // set initial state
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll);
+  onScroll();
 }

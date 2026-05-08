@@ -5,9 +5,9 @@ export function renderTimeline() {
   const items = EVENT.itinerary.map((item, i) => `
     <div class="timeline__item ${i % 2 === 0 ? 'reveal-left' : 'reveal-right'} delay-${Math.min(i + 1, 7)}">
       <div class="timeline__icon" aria-hidden="true">${item.icon}</div>
-      <div class="timeline__content">
-        <p class="timeline__time">${item.time}</p>
+      <div class="timeline__text-content">
         <p class="timeline__activity">${item.label}</p>
+        <span class="timeline__time">${item.time}</span>
       </div>
     </div>
   `).join('');

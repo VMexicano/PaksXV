@@ -3,7 +3,9 @@
    ============================================================ */
 
 #rsvp {
-  background: var(--cream);
+  background: var(--glass-cream);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   padding-block: var(--section-py);
 }
 

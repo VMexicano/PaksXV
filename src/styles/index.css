@@ -18,36 +18,47 @@
 
 /* ---- CSS Custom Properties (Tokens) ---- */
 :root {
-  /* Palette */
-  --navy:            #1a3a5c;
-  --navy-dark:       #0d2137;
-  --navy-mid:        #1e4570;
-  --navy-light:      #2a5a8c;
+  /* Palette - Deep Ink & Gold */
+  --navy-deep:       #0a192f;
+  --navy-ink:        #112240;
+  --navy-light:      #233554;
+  --gold-accent:     #c5a059;
+  --gold-light:      #e2c686;
+  --gold-soft:       #d4b87a;
+  --gold-deep:       #8a6d35;
+  --wine-wax:        #8b0000;
+  --wine-wax-light:  #a52a2a;
+
+  --navy-dark:       var(--navy-deep);
+  --navy-mid:        #1a3050;
+  
   --silver:          #c0c0c0;
   --silver-light:    #e0e0e0;
   --silver-shine:    #f0f0f0;
   --silver-dark:     #8a8a8a;
-  --cream:           #f5f0e8;
-  --cream-dark:      #ede7db;
-  --cream-mid:       #e8e0d0;
+  
+  --cream-texture:   #e8e2d6;
+  --cream-dark:      #d8d2c6;
+  --cream-mid:       #f5f2eb;
+  
   --white:           #ffffff;
   --black:           #0a0a0a;
 
   /* Semantic */
-  --color-bg:        var(--cream);
-  --color-text:      var(--navy-dark);
-  --color-text-soft: #5a6a7a;
-  --color-accent:    var(--silver);
-  --color-primary:   var(--navy);
+  --color-bg:        var(--navy-deep);
+  --color-text:      var(--silver-light);
+  --color-text-soft: #8892b0;
+  --color-accent:    var(--gold-accent);
+  --color-primary:   var(--navy-ink);
   --color-success:   #4a8c6a;
   --color-error:     #8c4a4a;
   --color-warning:   #8c7a4a;
 
-  /* Glass */
-  --glass-navy:      rgba(26, 58, 92, 0.15);
-  --glass-silver:    rgba(192, 192, 192, 0.18);
-  --glass-cream:     rgba(245, 240, 232, 0.85);
-  --glass-white:     rgba(255, 255, 255, 0.12);
+  /* Glass - Liquid */
+  --glass-navy:      rgba(17, 34, 64, 0.4);
+  --glass-gold:      rgba(197, 160, 89, 0.15);
+  --glass-cream:     rgba(232, 226, 214, 0.85);
+  --glass-white:     rgba(255, 255, 255, 0.05);
 
   /* Typography */
   --font-display:    'Playfair Display', Georgia, serif;
@@ -136,6 +147,69 @@ body {
   min-height: 100dvh;
 }
 
+/* Cosmic stardust parallax background */
+.cosmos {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 20% 10%, rgba(197, 160, 89, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(197, 160, 89, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, var(--navy-ink) 0%, var(--navy-deep) 70%);
+}
+
+.cosmos::before,
+.cosmos::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  /* Extend width and height by the maximum translation value (800px) 
+     so moving it -800px never reveals the bottom/right edge of the element */
+  width: calc(100% + 800px);
+  height: calc(100% + 800px);
+}
+
+/* Base layer: Small and medium stars */
+.cosmos::before {
+  background-image:
+    radial-gradient(1px 1px at 20% 30%, rgba(255, 255, 255, 0.8) 50%, transparent),
+    radial-gradient(1px 1px at 60% 70%, rgba(255, 255, 255, 0.6) 50%, transparent),
+    radial-gradient(2px 2px at 80% 20%, rgba(197, 160, 89, 0.9) 50%, transparent), /* Medium gold */
+    radial-gradient(1px 1px at 40% 80%, rgba(255, 255, 255, 0.5) 50%, transparent),
+    radial-gradient(2px 2px at 90% 50%, rgba(255, 255, 255, 0.7) 50%, transparent), /* Medium white */
+    radial-gradient(1px 1px at 10% 60%, rgba(197, 160, 89, 0.6) 50%, transparent),
+    radial-gradient(1px 1px at 30% 10%, rgba(255, 255, 255, 0.8) 50%, transparent),
+    radial-gradient(2px 2px at 70% 40%, rgba(255, 255, 255, 0.5) 50%, transparent);
+  background-size: 600px 600px;
+  animation: cosmicDrift 90s linear infinite; /* Distant stars move slower */
+  opacity: 0.7;
+}
+
+/* Top layer: Larger, glowing stars with faster drift for 3D parallax */
+.cosmos::after {
+  background-image:
+    radial-gradient(5px 5px at 30% 60%, rgba(255, 255, 255, 1) 5%, rgba(255, 255, 255, 0.3) 50%, transparent), /* Giant glowing white (the 10%) */
+    radial-gradient(3px 3px at 15% 15%, rgba(255, 255, 255, 1) 10%, rgba(255, 255, 255, 0.2) 60%, transparent), /* Big glowing white */
+    radial-gradient(4px 4px at 75% 65%, rgba(197, 160, 89, 1) 10%, rgba(197, 160, 89, 0.2) 60%, transparent), /* Big glowing gold */
+    radial-gradient(3px 3px at 50% 85%, rgba(255, 255, 255, 0.9) 10%, rgba(255, 255, 255, 0.1) 60%, transparent),
+    radial-gradient(2px 2px at 85% 35%, rgba(255, 255, 255, 0.8) 20%, transparent);
+  background-size: 800px 800px; /* Larger tile size so they are more sparse */
+  animation: cosmicDriftLarge 40s linear infinite; /* Closer stars move faster */
+  opacity: 0.9;
+}
+
+@keyframes cosmicDrift {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-600px, -600px, 0); }
+}
+
+@keyframes cosmicDriftLarge {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-800px, -800px, 0); }
+}
+
 img, video, svg {
   display: block;
   max-width: 100%;
@@ -182,6 +256,7 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); line-height: 1.2; }
 .section {
   padding-block: var(--section-py);
   position: relative;
+  z-index: 2;
 }
 .section-cream  { background-color: var(--cream); }
 .section-navy   { background-color: var(--navy-dark); color: var(--cream); }
@@ -469,7 +544,7 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); line-height: 1.2; }
 .music-overlay {
   position: fixed;
   inset: 0;
-  background: var(--navy-dark);
+  background: var(--navy-deep);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -479,6 +554,92 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); line-height: 1.2; }
   transition: opacity var(--duration-slow) var(--ease-out);
   cursor: pointer;
 }
+
+.music-overlay__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.music-overlay__seal-container {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5));
+}
+
+.music-overlay__seal-image {
+  position: absolute;
+  width: 100%;
+  left: 0;
+  object-fit: contain;
+}
+
+.split-top {
+  top: 0;
+  height: 50%;
+  transform-origin: bottom center;
+}
+
+.split-bottom {
+  bottom: 0;
+  height: 50%;
+}
+
+.music-overlay__seal-text {
+  position: absolute;
+  z-index: 10;
+  color: #dfcdb3; /* Golden wax inset text color */
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.4), -1px -1px 1px rgba(255,255,255,0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding-top: 5px; /* Visual centering adjustment for the seal */
+}
+
+.music-overlay__seal-monogram {
+  font-family: var(--font-display);
+  font-size: 2.2rem;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  font-style: italic;
+}
+
+.music-overlay__seal-date {
+  font-family: var(--font-body);
+  font-size: 0.6rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  margin-top: -2px;
+  opacity: 0.9;
+}
+
+.text-gold-shimmer {
+  background: linear-gradient(90deg, var(--gold-accent) 25%, var(--gold-light) 50%, var(--gold-accent) 75%);
+  background-size: 200% auto;
+  animation: shimmer 3s linear infinite;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gold-accent {
+  color: var(--gold-accent);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  letter-spacing: 1px;
+}
+
 .music-overlay.hidden {
   opacity: 0;
   pointer-events: none;

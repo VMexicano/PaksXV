@@ -1,9 +1,9 @@
 /* ============================================================
-   COUNTDOWN
+   COUNTDOWN (Minimalist Deep Ink)
    ============================================================ */
 
 #countdown {
-  background: var(--navy-dark);
+  background: transparent;
   padding-block: var(--section-py);
   position: relative;
   overflow: hidden;
@@ -16,8 +16,9 @@
   top: -50%;
   left: 50%;
   transform: translateX(-50%);
-  width: 600px; height: 600px;
-  background: radial-gradient(ellipse, rgba(42,90,140,0.4) 0%, transparent 70%);
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(ellipse, rgba(42, 90, 140, 0.15) 0%, transparent 70%);
   pointer-events: none;
 }
 
@@ -28,125 +29,112 @@
 }
 
 .countdown__eyebrow {
+  font-family: var(--font-accent);
+  font-size: clamp(24px, 5vw, 36px);
+  color: var(--white);
+  margin-bottom: var(--space-4);
+  opacity: 0.9;
+}
+
+.countdown__date {
+  font-family: var(--font-elegant);
+  font-size: clamp(32px, 8vw, 64px);
+  color: var(--white);
+  margin-bottom: var(--space-2);
+  line-height: 1.2;
+}
+
+.countdown__time {
   font-family: var(--font-body);
-  font-size: var(--text-xs);
-  letter-spacing: 0.25em;
-  text-transform: uppercase;
-  color: var(--silver-dark);
-  margin-bottom: var(--space-3);
+  font-size: clamp(16px, 4vw, 20px);
+  color: var(--white);
+  opacity: 0.8;
+  margin-bottom: var(--space-8);
 }
 
 .countdown__title {
   font-family: var(--font-display);
-  font-size: clamp(var(--text-3xl), 5vw, var(--text-5xl));
-  color: var(--silver-light);
-  margin-bottom: var(--space-2);
+  font-size: clamp(var(--text-3xl), 6vw, var(--text-6xl));
+  color: var(--white);
+  margin-bottom: var(--space-4);
+  font-weight: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+.countdown__sep {
+  opacity: 0.5;
+  font-weight: 100;
+  transform: translateY(-2px);
+  /* visual centering */
+}
+
+.countdown__title span:not(.countdown__sep) {
+  min-width: 2ch;
 }
 
 .countdown__subtitle {
-  font-family: var(--font-elegant);
-  font-size: var(--text-xl);
-  color: var(--silver-dark);
-  font-style: italic;
-}
-
-/* ---- Timer cards ---- */
-.countdown__timer {
-  display: flex;
-  justify-content: center;
-  align-items: stretch;
-  gap: var(--space-4);
-  flex-wrap: wrap;
-  margin-bottom: var(--space-12);
-}
-
-.countdown__unit {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-width: 72px;
-}
-
-.countdown__number {
-  font-family: var(--font-display);
-  font-size: clamp(var(--text-4xl), 8vw, var(--text-6xl));
-  font-weight: 700;
-  color: transparent;
-  background: linear-gradient(180deg, var(--silver-shine) 0%, var(--silver) 50%, var(--silver-dark) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  line-height: 1;
-  min-width: 2ch;
-  text-align: center;
-  letter-spacing: -0.02em;
-  padding: var(--space-4) var(--space-5);
-  background-color: rgba(255,255,255,0.03);
-  border: 1px solid rgba(192,192,192,0.15);
-  border-radius: var(--radius-md);
-  transition: color 0.3s;
-}
-
-.countdown__label {
-  font-size: var(--text-xs);
-  letter-spacing: 0.15em;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--white);
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--silver-dark);
-  margin-top: var(--space-2);
-}
-
-.countdown__separator {
-  font-family: var(--font-display);
-  font-size: clamp(var(--text-3xl), 6vw, var(--text-5xl));
-  color: var(--silver-dark);
-  align-self: center;
-  padding-bottom: var(--space-6);
-  line-height: 1;
+  opacity: 0.8;
+  margin-top: 0;
 }
 
 /* ---- Calendar button ---- */
 .countdown__actions {
   display: flex;
   justify-content: center;
+  margin-top: var(--space-12);
 }
 
 .btn-calendar {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-4) var(--space-8);
+  justify-content: center;
+  padding: 1rem 2rem;
   background: transparent;
-  border: 1px solid rgba(192,192,192,0.4);
-  border-radius: var(--radius-full);
-  color: var(--silver-light);
-  font-family: var(--font-body);
-  font-size: var(--text-sm);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 100px;
+  /* Big pill shape */
+  color: var(--white);
   cursor: pointer;
   transition: all var(--duration-base) var(--ease-out);
   position: relative;
   overflow: hidden;
 }
 
+.countdown-oval-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+  /* Let clicks pass to the button */
+}
+
 .btn-calendar::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(192,192,192,0.1) 0%, transparent 100%);
+  background: rgba(255, 255, 255, 0.05);
   opacity: 0;
   transition: opacity var(--duration-base);
 }
 
 .btn-calendar:hover {
-  border-color: var(--silver);
+  border-color: var(--white);
   transform: translateY(-2px);
-  box-shadow: 0 0 24px rgba(192,192,192,0.15);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
 }
-.btn-calendar:hover::before { opacity: 1; }
-.btn-calendar:active { transform: scale(0.98); }
 
-.btn-calendar svg {
-  width: 18px; height: 18px;
-  color: var(--silver);
-  flex-shrink: 0;
+.btn-calendar:hover::before {
+  opacity: 1;
+}
+
+.btn-calendar:active {
+  transform: scale(0.98);
 }
